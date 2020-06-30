@@ -3,9 +3,14 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-const isAuth = require('./middleware/is-auth');
+//const isAuth = require('./middleware/is-auth');
 
-const db = require('./database/db');
+//const db = require('./database/db');
+
+//================== routes =======================
+const taskRoutes = require('./routes/task.js');
+//const authRoutes = require('./routes/auth.js');
+//=======================================
 
 app.use(bodyParser.json());     //application/json
 
@@ -18,7 +23,9 @@ app.use((req,res,next)=>{
     }
     next();
 })
-
+console.log('success');
+app.use(taskRoutes);
 //db.execute('')
 
-app.listen(3000);
+
+app.listen(8080);
