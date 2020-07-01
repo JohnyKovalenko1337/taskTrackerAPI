@@ -13,6 +13,8 @@ const taskRoutes = require('./routes/task.js');
 //=======================================
 
 app.use(bodyParser.json());     //application/json
+app.use(bodyParser.urlencoded({ extended: true }));
+
 
 app.use((req,res,next)=>{
     res.setHeader('Access-Control-Allow-Origin','*');
@@ -23,9 +25,11 @@ app.use((req,res,next)=>{
     }
     next();
 })
-console.log('success');
-app.use(taskRoutes);
+
+app.use('/task',taskRoutes);
 //db.execute('')
 
 
-app.listen(8080);
+app.listen(8080,()=>{
+    console.log('success');
+});
