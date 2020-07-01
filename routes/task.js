@@ -7,6 +7,10 @@ const isAuth = require('../middleware/is-auth');
 
 const router = express.Router();
 
-router.get('/tasks', taskController.getTasks);
+router.get('/getTasks', taskController.getTasks);
+
+router.delete('/delete/:taskId',taskController.deletePost)
+
+router.post('/postTask', taskController.postTasks);
 
 module.exports = router;
