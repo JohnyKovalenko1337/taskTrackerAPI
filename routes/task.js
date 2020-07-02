@@ -9,7 +9,9 @@ const router = express.Router();
 
 router.get('/getTasks', taskController.getTasks);
 
-router.delete('/delete/:taskId',taskController.deletePost)
+router.put('/update/:taskId', taskController.updateTask);
+
+router.delete('/delete/:taskId',taskController.deleteTask);
 
 router.post('/postTask', taskController.postTasks);
 
