@@ -22,13 +22,18 @@ module.exports = class Task {
     static done(){
         return db.execute('INSERT INTO tasks (status) VALUES (?)',['DONE']);
     }
+    // ----------------------------updating---------------------------
+    static updateById(title, description, id){
+        return db.execute('UPDATE tasks SET title = (?), description = (?)  WHERE id = (?)',
+        [title,description,id]);
+    }
     // --------------------------deleting----------------------------
     static deleteById(id){
-        return db.execute('DELETE * FROM tasks WHERE tasks.id = (?)',[id]);
+        return db.execute('DELETE FROM tasks WHERE id = (?)',[id]);
     }
     // ------------------------finding by id------------------------
    static findById(id){
-        return db.execute('SELECT * FROM tasks WHERE tasks.id = (?)',[id]);
+        return db.execute('SELECT * FROM tasks WHERE id = (?)',[id]);
    }
    //--------------------------fething all tasks-----------------------
     static fetchAll(){

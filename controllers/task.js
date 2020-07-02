@@ -31,9 +31,10 @@ exports.postTasks=(req,res,next)=>{
     })
 };
 
-exports.deletePost=(req,res,next)=>{
+exports.deleteTask=(req,res,next)=>{
     const taskId = req.params.taskId;
-    Task.deleteById(taskId)
+    const id = Number.parseInt(taskId);
+    Task.deleteById(id)
         /* .then(result=>{
             return  User.findById(req.userId)
         })
@@ -47,4 +48,32 @@ exports.deletePost=(req,res,next)=>{
         .catch(err=>{
             console.log(err);
         });
+}
+
+exports.updateTask = (req,res,next)=>{
+    const title = req.body.title
+    const description = req.body.description;
+    const taskId = req.params.taskId;
+    const id = Number.parseInt(taskId);
+    Task.findById(id)
+        .then(taskych=>{
+            status = taskych[0][0].status;
+            if(status === 'view'){
+                return Task.updateById(title, description, id)
+                .then(result=>{
+                    console.log(result);
+                    res.status(200).json({
+                        message:"succesfuly updated!",
+                    })
+                })
+            }
+            else{
+                return res.status(200).json({
+                    message:"failed to update a task, because this task not on the view)"
+                })
+            } 
+        })
+        .catch(err=>{
+            console.log(err);
+        })
 }
