@@ -3,8 +3,9 @@ const jwt = require('jsonwebtoken');
 module.exports = (req, res, next) => {
     const authHeader = req.get('Authorization');
     if (!authHeader) {
-        req.isAuth = false;
-        return next();
+        return res.status(403).send({
+            message: "No token provided!"
+          });
     }
     const token = authHeader.split(' ')[1];
     let decodedToken;
@@ -12,14 +13,15 @@ module.exports = (req, res, next) => {
         decodedToken = jwt.verify(token, 'somesupersecret')
     }
     catch (err) {
-        req.isAuth = false;
-        return next();
+        return res.status(403).send({
+            message: err.message
+          });
     }
     if (!decodedToken) {
-        req.isAuth = false;
-        return next();
+        return res.status(403).send({
+            message: "token not verified"
+          });
     }
     req.userId = decodedToken.userId;
-    req.isAuth = true;
     next();
 }
