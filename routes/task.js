@@ -9,10 +9,14 @@ const router = express.Router();
 
 router.get('/getTasks', taskController.getTasks);
 
-router.put('/update/:taskId', taskController.updateTask);
+router.put('/update/:taskId', isAuth, taskController.updateTask);
 
-router.delete('/delete/:taskId',taskController.deleteTask);
+router.put('/update/status/inProgress/:taskId', isAuth, taskController.statusInProgress);
 
-router.post('/postTask', taskController.postTasks);
+router.put('/update/status/done/:taskId', isAuth, taskController.statusDone);
+
+router.delete('/delete/:taskId', isAuth, taskController.deleteTask);
+
+router.post('/postTask', isAuth, taskController.postTasks);
 
 module.exports = router;
