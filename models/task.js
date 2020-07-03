@@ -1,26 +1,32 @@
 const db = require('../database/db');
 
 module.exports = class Task {
-    constructor( title, description) {
+    constructor( title, description, creator) {
         this.title = title;
         this.description = description;
+        this.creator = creator
     };
 
     save(){
-        return db.execute('INSERT INTO tasks (title, description) VALUES (?, ?)',
-        [this.title, this.description]);
+        return db.execute('INSERT INTO tasks (title, description, creator) VALUES (?, ?, ?)',
+        [this.title, this.description, this.creator]);
     };
     //--------------------------status--------------------------------
     static setUser(userId){
         return db.execute('INSERT INTO tasks (userId) VALUES (?)',[userId]);
     }
 
-    static inProgress(){
-        return db.execute('INSERT INTO tasks (status) VALUES (?)',['In progress']);
+    static updateUser(userId, id){
+        return db.execute('UPDATE tasks SET userId = (?)  WHERE id = (?)',
+        [userId,id]);
     }
 
-    static done(){
-        return db.execute('INSERT INTO tasks (status) VALUES (?)',['DONE']);
+    static inProgress(id){
+        return db.execute('UPDATE tasks SET status = (?) WHERE id = (?)',['In progress',id]);
+    }
+
+    static done(id){
+        return db.execute('UPDATE tasks SET status = (?) WHERE id = (?)',['DONE',id]);
     }
     // ----------------------------updating---------------------------
     static updateById(title, description, id){
@@ -39,4 +45,8 @@ module.exports = class Task {
     static fetchAll(){
         return db.execute('SELECT * FROM tasks');
     }
+    // ---------------------------totalItems----------------------------
+    /* static countItems(){
+        return db.execute('SELECT SUM(TABLE_ROWS) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = tasks')
+    } */
 }
