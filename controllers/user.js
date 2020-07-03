@@ -1,16 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const Task = require('../models/task');
 
 exports.signup = (req, res, next) => {
-    /* const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        const error = new Error('Validation failed');
-        error.statusCode = 422;
-        error.data = errors.array();
-        throw error;
-        
-    } */
+
     const email = req.body.email;
     const password = req.body.password;
     const first_name = req.body.first_name;
@@ -19,7 +13,7 @@ exports.signup = (req, res, next) => {
         last_name,
         email,
         password)
-    bcrypt.hash(password, 12)
+    bcrypt.hash(password, 12)           // hashing password
         .then(hashedPw => {
             const user = new User(
                 first_name,
@@ -28,10 +22,10 @@ exports.signup = (req, res, next) => {
                 hashedPw
             );
             console.log(user);
-            return user.save()
+            return user.save()          //and save it to database
         })
         .then(result => {
-            res.status(201).json({ message: `successfuly added new user: ${first_name} ` })
+            res.status(201).json({ message: `successfuly added new user: ${first_name} ${last_name} ` })
         })
         .catch(err => {
             res.status(500).send({ message: err.message });
@@ -47,22 +41,22 @@ exports.login = (req, res, next) => {
             if (!user) {
                 res.status(401).send({ message: 'user couldnt be found' });
             }
-            loadedUser = user[0][0];
-            return bcrypt.compare(password, loadedUser.password);
+            loadedUser = user[0][0];                // taking user with found email
+            return bcrypt.compare(password, loadedUser.password);       //comparing passwords
         })
         .then((isEqual) => {
             if (!isEqual) {
                 res.status(401).send({ message: 'Password is wrong' });
             }
-            const token = jwt.sign(
+            const token = jwt.sign(                 // signing user
                 {
                     email: loadedUser.email, userId: loadedUser.id.toString()
                 },
-                'somesupersecret',
+                'somesupersecret',          // with this secret
                 {
-                    expiresIn: '1h'
+                    expiresIn: '1h'             // token will expire in 1 hour
                 });
-            res.status(200).json({
+            res.status(200).json({              // returning token and userId
                 token: token,
                 userId: loadedUser.id.toString()
             })
@@ -73,11 +67,18 @@ exports.login = (req, res, next) => {
 };
 
 exports.getAllUsers = (req, res, next) => {
-    User.fetchAll()
+    const limit = 3;
+    // page number
+    const page = req.query.page || 1;
+    // calculate offset
+    const offset = (page - 1) * limit;
+    User.fetchAll(limit, offset)
         .then(result => {
             console.log('from controller', result[0]);
             res.status(200).json({
                 message: "ALL THE USERS",
+                products_page_count:result[0].length,
+                page_number:page,
                 users: result[0],
             });
         })
@@ -108,9 +109,9 @@ exports.updateUser = (req, res, next) => {
     const last_name = req.body.last_name;
     const userId = req.params.userId;
     const id = Number.parseInt(userId);
-    bcrypt.hash(password, 12)
+    bcrypt.hash(password, 12)                       //hashing password
         .then(hashedPw => {
-            User.updateById(first_name, last_name, email, hashedPw, id)
+            User.updateById(first_name, last_name, email, hashedPw, id)     //put in constructor hashed version
                 .then(result => {
                     res.status(200).json({
                         message: "succesfuly updated!",
@@ -125,7 +126,7 @@ exports.updateUser = (req, res, next) => {
 exports.deleteUser = (req, res, next) => {
     const userId = req.params.userId;
     const id = Number.parseInt(userId);
-    User.deleteById(id)
+    User.deleteById(id)                             
         .then(result => {
             res.status(200).json({ message: 'User deleted successfuly', })
         })
@@ -148,6 +149,28 @@ exports.getFreeUsers = (req, res, next) => {
                     user: result[0]
                 })
             }
+        })
+        .catch(err => {
+            res.status(500).send({ message: err.message });
+        })
+}
+
+exports.giveTask = (req, res, next) => {
+    const userId = req.params.userId;
+    const userychid = Number.parseInt(userId);
+    const taskId = req.params.taskId;
+    const taskychId = Number.parseInt(taskId);
+    User.giveTask(taskychId, userychid)                       //giving task for the user
+        .then(result => {
+            return Task.setUser(userychid, taskychId);          //setting to task executer
+        })
+        .then(result => {
+            return Task.inProgress(taskychId);              //changing status of task
+        })
+        .then(result => {
+            res.status(200).json({
+                message: "task has been successfuly added"
+            });
         })
         .catch(err => {
             res.status(500).send({ message: err.message });
