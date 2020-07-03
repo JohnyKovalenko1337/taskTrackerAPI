@@ -13,8 +13,8 @@ module.exports = class User {
             [this.first_name, this.last_name, this.email, this.password]);
     };
     // ----------------------------------------- fetching -----------------------------------
-    static fetchAll() {
-        return db.execute('SELECT * FROM user');
+    static fetchAll(limit,offset) {
+        return db.execute(`SELECT * FROM user LIMIT ${limit} OFFSET ${offset}`);
     }
 
     static fetchFreeUsers(){
