@@ -12,10 +12,6 @@ module.exports = class Task {
         [this.title, this.description, this.creator]);
     };
     //--------------------------status--------------------------------
-    static setUser(userId){
-        return db.execute('INSERT INTO tasks (userId) VALUES (?)',[userId]);
-    }
-
     static updateUser(userId, id){
         return db.execute('UPDATE tasks SET userId = (?)  WHERE id = (?)',
         [userId,id]);
@@ -29,6 +25,10 @@ module.exports = class Task {
         return db.execute('UPDATE tasks SET status = (?) WHERE id = (?)',['DONE',id]);
     }
     // ----------------------------updating---------------------------
+    static setUser(userId, taskId){
+        return db.execute('UPDATE tasks SET userId = (?) WHERE id = (?)',[userId, taskId]);
+    }
+
     static updateById(title, description, id){
         return db.execute('UPDATE tasks SET title = (?), description = (?)  WHERE id = (?)',
         [title,description,id]);
@@ -42,11 +42,7 @@ module.exports = class Task {
         return db.execute('SELECT * FROM tasks WHERE id = (?)',[id]);
    }
    //--------------------------fething all tasks-----------------------
-    static fetchAll(){
-        return db.execute('SELECT * FROM tasks');
+    static fetchAll(status){
+        return db.execute('SELECT * FROM tasks WHERE status = (?)',[status]);
     }
-    // ---------------------------totalItems----------------------------
-    /* static countItems(){
-        return db.execute('SELECT SUM(TABLE_ROWS) FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = tasks')
-    } */
 }
