@@ -2,16 +2,15 @@ const Task = require('../models/task');
 const User = require('../models/user');
 
 exports.getTasks = (req, res, next) => {
-    /* const currentPage = req.query.page || 1;
-    const perPage = 5;
-    totalItems = Task.countItems(); */
-    Task.fetchAll()
+    const status = req.query.status || 'view';
+    Task.fetchAll(status)
         .then(result => {
-            console.log('from controller', result[0]);
+            
             res.status(200).json({
                 message: "ALL THE TASKS",
+                filter: "Status: " + status,
                 tasks: result[0],
-                /*  totalItems: totalItems */
+                
             });
         })
         .catch(err => {
